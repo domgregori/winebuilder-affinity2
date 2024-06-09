@@ -177,7 +177,7 @@ setup_wine(){
 }
 
 add_winmd(){
-  while [ -z "$(ls -A $SCRIPT_DIR/add-Winmd-files-here)" ]; do
+  while [ -z "$(ls $SCRIPT_DIR/add-Winmd-files-here)" ]; do
     echo "Winmd files need to be added to \"add-Winmd-files-here\" folder"
     read -p "Press any key after adding files."
   done
@@ -188,7 +188,7 @@ add_winmd(){
 }
 
 install_affinity(){
-  while [ -z "$(ls -A $SCRIPT_DIR/add-affinity2.0.4-installer-here)" ]; do
+  while [ -z "$(ls $SCRIPT_DIR/add-affinity2.0.4-installer-here)" ]; do
     echo "Intaller not found. Add it to \"add-affinity2.0.4-installer-here\" folder"
     echo "File name must have affinity and 2.0.4 and exe in its name."
     read -p "Press any key after adding installer."
