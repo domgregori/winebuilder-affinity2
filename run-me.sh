@@ -5,9 +5,14 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-
+# check if user in docker group
+DOCKER_SUDO="sudo"
+if $(getent group docker | grep -vqw "$USER"); then
+  DOCKER_SUDO=""
 
 install_deps(){
+  echo "Installing dependencies, sudo will be used"
+  echo
   sudo apt update
   sudo apt install winetricks
   sudo apt install docker-ce docker-ce-cli docker-buildx-plugin
@@ -23,35 +28,35 @@ get_wine_source(){
 build_docker(){
   echo "Building docker enviroment..."
   echo
-  docker compose build
+  "$DOCKER_SUDO"docker compose build
 }
 
 start_docker(){
   echo "Starting docker container..."
   echo
-  docker compose up -d
+  "$DOCKER_SUDO"docker compose up -d
 }
 
 stop_docker(){
   echo "Stopping docker container..."
   echo
-  docker compose down -t 0
+  "$DOCKER_SUDO"docker compose down -t 0
 }
 
 make_wine64(){
   echo "Making Wine64. This takes 2-3hrs..."
   echo
   sleep 3
-  docker compose exec builder -w /wine-source/wine64-build /wine-source/configure --prefix=/wine-source/wine-install --enable-win64 
-  docker compose exec builder -w /wine-source/wine64-build make
+  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine64-build builder /wine-source/configure --prefix=/wine-source/wine-install --enable-win64 
+  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine64-build builder make
 }
 
 make_wine32(){
   echo "Making Wine32. This takes another 2-3hrs..."
   echo
   sleep 3
-  docker compose exec builder -w /wine-source/wine32-build PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig /wine-source/configure --with-wine64=/wine-source/wine64-build --prefix=/wine-source/wine-install
-  docker compose exec builder -w /wine32-build make
+  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine32-build builder PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig /wine-source/configure --with-wine64=/wine-source/wine64-build --prefix=/wine-source/wine-install
+  "$DOCKER_SUDO"docker compose exec -w /wine32-build builder make
 }
 
 wine32_binaries(){
@@ -216,7 +221,8 @@ full_script(){
   create_shortcuts
 }
 
-
+echo
+echo
 echo "     _     __  __ _       _ _          __        ___             "
 echo "    / \   / _|/ _(_)_ __ (_) |_ _   _  \ \      / (_)_ __   ___  "
 echo "   / _ \ | |_| |_| | '_ \| | __| | | |  \ \ /\ / /| | '_ \ / _ \ "
@@ -234,26 +240,26 @@ echo
 
 
 while true; do
-    echo "Run full script ot jump to section?"
-    echo "A................................Full Script"
-    echo "1............................Get Wine-Source"
-    echo "2...............................Build Docker"
-    echo "3...............................Start Docker"
-    echo "4................................Make Wine64"
-    echo "5................................Make Wine32"
-    echo "6.....................Create Wine32 Binaries"
-    echo "7.....................Create Wine64 Binaries"
-    echo "8.....................Install Wine on System"
-    echo "9......................Install rum on System"
-    echo "B......................Setup Wine Enviroment"
-    echo "C............................Add Winmd Files"
-    echo "D...........................Install Affinity"
-    echo "E.......................Install Dependencies"
-    echo "F..............................Test Affinity"
-    echo "G..................Test Affinity with Vulkan"
-    echo "H..................Create Launcher Shortcuts"
-    echo "I......................Stop Docker Container"
-    echo "X......................Clean up docker/files"
+    echo "   ######### Full script choose 'A' ###########"
+    echo "   A................................Full Script"
+    echo "   1............................Get Wine-Source"
+    echo "   2...............................Build Docker"
+    echo "   3...............................Start Docker"
+    echo "   4................................Make Wine64"
+    echo "   5................................Make Wine32"
+    echo "   6.....................Create Wine32 Binaries"
+    echo "   7.....................Create Wine64 Binaries"
+    echo "   8.....................Install Wine on System"
+    echo "   9......................Install rum on System"
+    echo "   B......................Setup Wine Enviroment"
+    echo "   C............................Add Winmd Files"
+    echo "   D...........................Install Affinity"
+    echo "   E.......................Install Dependencies"
+    echo "   F..............................Test Affinity"
+    echo "   G..................Test Affinity with Vulkan"
+    echo "   H..................Create Launcher Shortcuts"
+    echo "   I......................Stop Docker Container"
+    echo "   X......................Clean up docker/files"
     echo
 
     read -p "Choice: " ans
