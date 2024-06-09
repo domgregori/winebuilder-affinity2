@@ -5,89 +5,6 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-echo "     _     __  __ _       _ _          __        ___             "
-echo "    / \   / _|/ _(_)_ __ (_) |_ _   _  \ \      / (_)_ __   ___  "
-echo "   / _ \ | |_| |_| | '_ \| | __| | | |  \ \ /\ / /| | '_ \ / _ \ "
-echo "  / ___ \|  _|  _| | | | | | |_| |_| |   \ V  V / | | | | |  __/ "
-echo " /_/   \_\_| |_| |_|_| |_|_|\__|\__, |    \_/\_/  |_|_| |_|\___| "
-echo "               ___           _  |___/ _ _                        "
-echo "              |_ _|_ __  ___| |_ __ _| | | ___ _ __              "
-echo "               | || '_ \/ __| __/ _\` | | |/ _ \ '__|            "
-echo "               | || | | \__ \ || (_| | | |  __/ |                "
-echo "              |___|_| |_|___/\__\__,_|_|_|\___|_|                "
-echo "                                                                 "
-echo
-echo
-echo
-
-
-while true; do
-    echo "Run full script ot jump to section?"
-    echo "A................................Full Script"
-    echo "1............................Get Wine-Source"
-    echo "2...............................Build Docker"
-    echo "3...............................Start Docker"
-    echo "4................................Make Wine64"
-    echo "5................................Make Wine32"
-    echo "6.....................Create Wine32 Binaries"
-    echo "7.....................Create Wine64 Binaries"
-    echo "8.....................Install Wine on System"
-    echo "9......................Install rum on System"
-    echo "B......................Setup Wine Enviroment"
-    echo "C............................Add Winmd Files"
-    echo "D...........................Install Affinity"
-    echo "E.......................Install Dependencies"
-    echo "F..............................Test Affinity"
-    echo "G..................Test Affinity with Vulkan"
-    echo "H..................Create Launcher Shortcuts"
-    echo "I......................Stop Docker Container"
-    echo "X......................Clean up docker/files"
-    echo
-
-    read -p "Choice: " ans
-    case $ans in
-        [Aa]* ) echo "Running Full Script";
-                full_script
-                break;;
-        [1]* )  get_wine_source;
-                break;;
-        [2]* )  build_docker;
-                break;;
-        [3]* )  start_docker;
-                break;;
-        [4]* )  make_wine64;
-                break;;
-        [5]* )  make_wine32;
-                break;;
-        [6]* )  wine32_binaries;
-                break;;
-        [7]* )  wine64_binaries;
-                break;;
-        [8]* )  install_wine;
-                break;;
-        [9]* )  install_rum;
-                break;;
-        [Bb]* ) setup_wine;
-                break;;
-        [Cc]* ) add_winmd;
-                break;;
-        [Dd]* ) install_affinity;
-                break;;
-        [Ee]* ) install_deps;
-                break;;
-        [Ff]* ) _test_affinity;
-                break;;
-        [Gg]* ) _test_affinity_vulkan;
-                break;;
-        [Hh]* ) _create_shortcuts;
-                break;;
-        [Ii]* ) stop_docker;
-                break;;
-        [Xx]* ) _cleanup;
-                break;;
-        * ) echo "Not a valid choice.";;
-    esac
-done
 
 
 install_deps(){
@@ -298,3 +215,88 @@ full_script(){
   test_affinity_vulkan
   create_shortcuts
 }
+
+
+echo "     _     __  __ _       _ _          __        ___             "
+echo "    / \   / _|/ _(_)_ __ (_) |_ _   _  \ \      / (_)_ __   ___  "
+echo "   / _ \ | |_| |_| | '_ \| | __| | | |  \ \ /\ / /| | '_ \ / _ \ "
+echo "  / ___ \|  _|  _| | | | | | |_| |_| |   \ V  V / | | | | |  __/ "
+echo " /_/   \_\_| |_| |_|_| |_|_|\__|\__, |    \_/\_/  |_|_| |_|\___| "
+echo "               ___           _  |___/ _ _                        "
+echo "              |_ _|_ __  ___| |_ __ _| | | ___ _ __              "
+echo "               | || '_ \/ __| __/ _\` | | |/ _ \ '__|            "
+echo "               | || | | \__ \ || (_| | | |  __/ |                "
+echo "              |___|_| |_|___/\__\__,_|_|_|\___|_|                "
+echo "                                                                 "
+echo
+echo
+echo
+
+
+while true; do
+    echo "Run full script ot jump to section?"
+    echo "A................................Full Script"
+    echo "1............................Get Wine-Source"
+    echo "2...............................Build Docker"
+    echo "3...............................Start Docker"
+    echo "4................................Make Wine64"
+    echo "5................................Make Wine32"
+    echo "6.....................Create Wine32 Binaries"
+    echo "7.....................Create Wine64 Binaries"
+    echo "8.....................Install Wine on System"
+    echo "9......................Install rum on System"
+    echo "B......................Setup Wine Enviroment"
+    echo "C............................Add Winmd Files"
+    echo "D...........................Install Affinity"
+    echo "E.......................Install Dependencies"
+    echo "F..............................Test Affinity"
+    echo "G..................Test Affinity with Vulkan"
+    echo "H..................Create Launcher Shortcuts"
+    echo "I......................Stop Docker Container"
+    echo "X......................Clean up docker/files"
+    echo
+
+    read -p "Choice: " ans
+    case $ans in
+        [Aa]* ) echo "Running Full Script";
+                full_script
+                break;;
+        [1]* )  get_wine_source;
+                break;;
+        [2]* )  build_docker;
+                break;;
+        [3]* )  start_docker;
+                break;;
+        [4]* )  make_wine64;
+                break;;
+        [5]* )  make_wine32;
+                break;;
+        [6]* )  wine32_binaries;
+                break;;
+        [7]* )  wine64_binaries;
+                break;;
+        [8]* )  install_wine;
+                break;;
+        [9]* )  install_rum;
+                break;;
+        [Bb]* ) setup_wine;
+                break;;
+        [Cc]* ) add_winmd;
+                break;;
+        [Dd]* ) install_affinity;
+                break;;
+        [Ee]* ) install_deps;
+                break;;
+        [Ff]* ) _test_affinity;
+                break;;
+        [Gg]* ) _test_affinity_vulkan;
+                break;;
+        [Hh]* ) _create_shortcuts;
+                break;;
+        [Ii]* ) stop_docker;
+                break;;
+        [Xx]* ) _cleanup;
+                break;;
+        * ) echo "Not a valid choice.";;
+    esac
+done
