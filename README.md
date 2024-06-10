@@ -1,4 +1,4 @@
-# Winebuilder For Affinity 2.0.4
+# Winebuilder For Affinity
 
 Docker container and script for building ElementalWarrior's fork of winehq [link](https://gitlab.winehq.org/ElementalWarrior/wine)
 
@@ -9,7 +9,9 @@ Docker container is a fork of [winebuilder](https://github.com/castaneai/winebui
 
 # Dependencies
 `sudo apt update && sudo apt install git`
+
 I'm running on Debian 22
+
 Also `docker`, `winetricks` are needed and can be installed with script
 <br/><br/>
 
@@ -18,7 +20,7 @@ Also `docker`, `winetricks` are needed and can be installed with script
 <br/><br/>
 
 ## Add Installer
-Add Affinity msi .exe installer to `add-affinity2.0.4-installer-here`
+Add Affinity msi .exe installer to `add-affinity-installer-here`
 <br/><br/>
 
 ## Add Winmd files
@@ -39,6 +41,6 @@ To run the full script, choose `A`
 # Why
 Having the right building dependencies can be a nightmare especially with multiple architecture. This docker container makes it much eaiser.
 
-ElementalWarrior forked the wine source to make a version that works with Affinity 2.0.4 but it needs to be built.
+ElementalWarrior forked the wine source to make a version that works with Affinity but it needs to be built.
 
 Created the script to make the process more cohesive.
