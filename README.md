@@ -1,38 +1,38 @@
 # Winebuilder For Affinity 2.0.4
 
-Docker container and script for building ElementalWarrior's fork of winehq (link)[https://gitlab.winehq.org/ElementalWarrior/wine]
+Docker container and script for building ElementalWarrior's fork of winehq [link](https://gitlab.winehq.org/ElementalWarrior/wine)
 
-Script is based off this (site)[https://codeberg.org/Wanesty/affinity-wine-docs]
+Script is based off this [site](https://codeberg.org/Wanesty/affinity-wine-docs)
 
-Docker container is a fork of (winebuilder)[https://github.com/castaneai/winebuilder]
+Docker container is a fork of [winebuilder](https://github.com/castaneai/winebuilder)
 <br/><br/>
 
 # Dependencies
-```sudo apt update && sudo apt install git```
+`sudo apt update && sudo apt install git`
 I'm running on Debian 22
-Also ```docker```, ```winetricks``` are needed and can be installed with script
+Also `docker`, `winetricks` are needed and can be installed with script
 <br/><br/>
 
 ## Clone repo
-```git clone https://github.com/domgregori/winebuilder-affinity2.git && cd winebuilder-affinity2```
+`git clone https://github.com/domgregori/winebuilder-affinity2.git && cd winebuilder-affinity2`
 <br/><br/>
 
 ## Add Installer
-Add Affinity msi .exe installer to ```add-affinity2.0.4-installer-here```
+Add Affinity msi .exe installer to `add-affinity2.0.4-installer-here`
 <br/><br/>
 
 ## Add Winmd files
-***you will need a to get Winmd files from a windows virtual machine, partition or from a friend***
+**you will need a to get Winmd files from a windows virtual machine, partition or from a friend**
 
-Located in ```C:/Windows/System32/WinMetadata```
+Located in `C:/Windows/System32/WinMetadata`
 
-Files inside of ```WinMetadata``` need to be coppied to ```add-Winmd-files-here```
+Files inside of `WinMetadata` need to be coppied to `add-Winmd-files-here`
 <br/><br/>
 
 ## Run Scipt
-run ```./run-me.sh```
+run `./run-me.sh`
 
-To run the full script, choose ```A```
+To run the full script, choose `A`
 
 <br/><br/>
 
