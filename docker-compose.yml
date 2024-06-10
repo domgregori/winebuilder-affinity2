@@ -1,0 +1,25 @@
+services:
+  builder:
+    build: .
+    command: tail -f /dev/null
+    volumes:
+      - ./wine-source:/wine-source
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - wineprefix:/root/.wine
+      - commandhistory:/commandhistory
+    environment: 
+      DISPLAY: "${DISPLAY}"
+      PULSE_SERVER: host.docker.internal:4713
+      WINEDLLOVERRIDES: "mscoree=d;mshtml=d"
+      LANG: en_US.UTF-8
+      TZ: America/New_York
+      # https://code.visualstudio.com/remote/advancedcontainers/persist-bash-history
+      HISTFILE: /commandhistory/.bash_history
+    # ref: https://github.com/osrf/docker_images/issues/21#issuecomment-239334515
+    ipc: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  commandhistory:
+  wineprefix:
