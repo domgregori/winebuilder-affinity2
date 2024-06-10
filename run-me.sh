@@ -69,7 +69,7 @@ install_wine(){
   echo
   sudo mkdir /opt/wines
   sudo cp -r "$SCRIPT_DIR"/wine-source/wine-install /opt/wines/ElementalWarrior-$WINE_V
-  sudo ln -s /opt/wines/ElementalWarrior-$WINE_V/bin/wine /opt/wines/ElementalWarrior-$WINE_V/bin/wine
+  sudo ln -s /opt/wines/ElementalWarrior-$WINE_V/bin/wine /opt/wines/ElementalWarrior-$WINE_V/bin/wine64
 }
 
 install_rum(){
@@ -96,7 +96,6 @@ add_winmd(){
 
   echo "Adding Winmd files..."
   echo
-  mkdir "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
   cp -r "$SCRIPT_DIR/add-Winmd-files-here" "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
 }
 
@@ -170,7 +169,7 @@ _create_shortcuts(){
   echo "Terminal=false" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
   echo "Type=Application" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
 
-  echo "Exec=/usr/bin/rum ElementalWarrior-$WINE_V $HOME/.wineAffinity wine \'$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe\'" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
+  echo "Exec=/usr/bin/rum ElementalWarrior-$WINE_V $HOME/.wineAffinity wine '$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe'" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
 }
 
 cleanup(){
@@ -189,9 +188,9 @@ cleanup(){
 _cleanup(){
   echo "Removing docker and folders"
   cd "$SCRIPT_DIR"
-  docker compose down --remove-orphans -v --rmi all
+  $DOCKER_SUDO docker compose down --remove-orphans -v --rmi all
   cd ..
-  rm -rf "$SCRIPT_DIR"
+  sudo rm -rf "$SCRIPT_DIR"
 }
 
 change_jobs(){
