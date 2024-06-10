@@ -34,19 +34,19 @@ get_wine_source(){
 build_docker(){
   echo "Building docker enviroment..."
   echo
-  "$DOCKER_SUDO" docker compose build
+  $DOCKER_SUDO docker compose build
 }
 
 start_docker(){
   echo "Starting docker container..."
   echo
-  "$DOCKER_SUDO" docker compose up -d
+  $DOCKER_SUDO docker compose up -d
 }
 
 stop_docker(){
   echo "Stopping docker container..."
   echo
-  "$DOCKER_SUDO" docker compose down -t 0
+  $DOCKER_SUDO docker compose down -t 0
 }
 
 make_wine(){

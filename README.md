@@ -28,7 +28,7 @@ Add Affinity msi .exe installer to `add-affinity-installer-here`
 
 Located in `C:/Windows/System32/WinMetadata`
 
-Files inside of `WinMetadata` need to be coppied to `add-Winmd-files-here`
+Files inside of `WinMetadata` need to be copied to `add-Winmd-files-here`
 <br/><br/>
 
 ## Run Scipt
