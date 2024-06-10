@@ -1,17 +1,25 @@
-# winebuilder for Affinity 2.0.4
+# Winebuilder For Affinity 2.0.4
 
-🍷 Wine build environment with Docker using ElementalWarrior fork of wine https://gitlab.winehq.org/ElementalWarrior/wine
+Docker container and script for building ElementalWarrior's fork of winehq (link)[https://gitlab.winehq.org/ElementalWarrior/wine]
 
-Script is based off this post: https://forum.affinity.serif.com/index.php?/topic/182758-affinity-suite-v204-on-linux-wine/
+Script is based off this (site)[https://codeberg.org/Wanesty/affinity-wine-docs]
 
-As well as this fork from https://github.com/castaneai/winebuilder
+Docker container is a fork of (winebuilder)[https://github.com/castaneai/winebuilder]
+<br/><br/>
+
+# Dependencies
+```sudo apt update && sudo apt install git```
+I'm running on Debian 22
+Also ```docker```, ```winetricks``` are needed and can be installed with script
+<br/><br/>
 
 ## Clone repo
-```git clone https://github.com/domgregori/winebuilder-affinity2.git```
-```cd winebuilder-affinity2```
+```git clone https://github.com/domgregori/winebuilder-affinity2.git && cd winebuilder-affinity2```
+<br/><br/>
 
 ## Add Installer
-Add Affinity installer to ```add-affinity2.0.4-installer-here```
+Add Affinity msi .exe installer to ```add-affinity2.0.4-installer-here```
+<br/><br/>
 
 ## Add Winmd files
 ***you will need a to get Winmd files from a windows virtual machine, partition or from a friend***
@@ -19,11 +27,18 @@ Add Affinity installer to ```add-affinity2.0.4-installer-here```
 Located in ```C:/Windows/System32/WinMetadata```
 
 Files inside of ```WinMetadata``` need to be coppied to ```add-Winmd-files-here```
-
+<br/><br/>
 
 ## Run Scipt
-in the ```winebuilder-affinity2``` folder run script
-
-```./run-me.sh```
+run ```./run-me.sh```
 
 To run the full script, choose ```A```
+
+<br/><br/>
+
+# Why
+Having the right building dependencies can be a nightmare especially with multiple architecture. This docker container makes it much eaiser.
+
+ElementalWarrior forked the wine source to make a version that works with Affinity 2.0.4 but it needs to be built.
+
+Created the script to make the process more cohesive.
