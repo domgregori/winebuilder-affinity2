@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 
 # Debugging
-#trap "set +x; sleep 5; set -x" DEBUG
+# trap "set +x; sleep 2; set -x" DEBUG
+JOBS=1
+WINE_V="8.14"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # check if user in docker group
 DOCKER_SUDO="sudo"
-if $(getent group docker | grep -vqw "$USER"); then
+if (getent group docker | grep -qw "$USER"); then
   DOCKER_SUDO=""
+fi
 
 install_deps(){
   echo "Installing dependencies, sudo will be used"
@@ -22,62 +25,51 @@ get_wine_source(){
   echo "Getting wine source from ElementalWarrior fork for Affinity..."
   echo
   git submodule update --init --progress
-  mkdir "$SCRIPT_DIR"/wine-source/wine32-build "$SCRIPT_DIR"/wine-source/wine64-build "$SCRIPT_DIR"/wine-source/wine-install
+  cd wine-source
+  git switch affinity-photo2-wine$WINE_V
+  mkdir "$SCRIPT_DIR"/wine-source/wine-build "$SCRIPT_DIR"/wine-source/wine-install
+  cd "$SCRIPT_DIR"
 }
 
 build_docker(){
   echo "Building docker enviroment..."
   echo
-  "$DOCKER_SUDO"docker compose build
+  "$DOCKER_SUDO" docker compose build
 }
 
 start_docker(){
   echo "Starting docker container..."
   echo
-  "$DOCKER_SUDO"docker compose up -d
+  "$DOCKER_SUDO" docker compose up -d
 }
 
 stop_docker(){
   echo "Stopping docker container..."
   echo
-  "$DOCKER_SUDO"docker compose down -t 0
+  "$DOCKER_SUDO" docker compose down -t 0
 }
 
-make_wine64(){
-  echo "Making Wine64. This takes 2-3hrs..."
+make_wine(){
+  echo "Making wine. This takes 1-2hrs..."
   echo
   sleep 3
-  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine64-build builder /wine-source/configure --prefix=/wine-source/wine-install --enable-win64 
-  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine64-build builder make
+  
+  $DOCKER_SUDO docker compose exec -w /wine-source/wine-build builder /wine-source/configure --prefix=/wine-source/wine-install --enable-archs=i386,x86_64
+  $DOCKER_SUDO docker compose exec -w /wine-source/wine-build builder make -j $JOBS
 }
 
-make_wine32(){
-  echo "Making Wine32. This takes another 2-3hrs..."
+wine_binaries(){
+  echo "Make wine Binaries..."
   echo
-  sleep 3
-  "$DOCKER_SUDO"docker compose exec -w /wine-source/wine32-build builder PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig /wine-source/configure --with-wine64=/wine-source/wine64-build --prefix=/wine-source/wine-install
-  "$DOCKER_SUDO"docker compose exec -w /wine32-build builder make
-}
-
-wine32_binaries(){
-  echo "Make Wine32 Binaries..."
-  echo
-  cd "$SCRIPT_DIR"/wine-source/wine32-build
-  make install
-}
-
-wine64_binaries(){
-  echo "Make Wine64 Binaries..."
-  echo
-  cd $SCRIPT_DIR/wine-source/wine64-build
-  make install
+  $DOCKER_SUDO docker compose exec -w /wine-source/wine-build builder make install
 }
 
 install_wine(){
-  echo "Installing Wine to /opt/wines/ElementalWarrior..."
+  echo "Installing Wine to /opt/wines/ElementalWarrior-$WINE_V..."
   echo
   sudo mkdir /opt/wines
-  sudo cp -r "$SCRIPT_DIR"/wine-source/wine-install /opt/wines/ElementalWarrior
+  sudo cp -r "$SCRIPT_DIR"/wine-source/wine-install /opt/wines/ElementalWarrior-$WINE_V
+  sudo ln -s /opt/wines/ElementalWarrior-$WINE_V/bin/wine /opt/wines/ElementalWarrior-$WINE_V/bin/wine
 }
 
 install_rum(){
@@ -89,34 +81,34 @@ install_rum(){
 }
 
 setup_wine(){
-  echo "Installing dotnet 48 and corefonts with winetricks..."
+  echo "Setting up wine..."
   echo
-  /usr/bin/rum ElementalWarrior "$HOME/.WineAffinity" winetricks dotnet48 corefonts
-
-  echo "Setting Win version to 11..."
-  echo 
-  /usr/bin/rum ElementalWarrior "$HOME/.WineAffinity" wine winecfg -v win11
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wineboot --init
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" winetricks dotnet48 corefonts vcrun2015
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine winecfg -v win11
 }
 
 add_winmd(){
-  while [ -z "$(ls $SCRIPT_DIR/add-Winmd-files-here)" ]; do
+  while [ -z "$(/bin/ls $SCRIPT_DIR/add-Winmd-files-here)" ]; do
     echo "Winmd files need to be added to \"add-Winmd-files-here\" folder"
     read -p "Press any key after adding files."
   done
 
   echo "Adding Winmd files..."
   echo
-  cp -r "$SCRIPT_DIR/add-Winmd-files-here" "$HOME/.WineAffinity/drive_c/Windows/System32/WinMetadata"
+  mkdir "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
+  cp -r "$SCRIPT_DIR/add-Winmd-files-here" "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
 }
 
 install_affinity(){
-  while [ -z "$(ls $SCRIPT_DIR/add-affinity2.0.4-installer-here)" ]; do
-    echo "Intaller not found. Add it to \"add-affinity2.0.4-installer-here\" folder"
-    echo "File name must have affinity and 2.0.4 and exe in its name."
+  while [ -z "$(/bin/ls $SCRIPT_DIR/add-affinity-installer-here)" ]; do
+    echo "Intaller not found. Add it to \"add-affinity-installer-here\" folder"
     read -p "Press any key after adding installer."
   done
-  AFFINITY_EXE="$SCRIPT_DIR/add-affinity2.0.4-installer-here/$(ls -A *ffinity*2.0.4*.exe)"
-  /usr/bin/rum ElementalWarrior "$HOME/.WineAffinity" wine "$AFFINITY_EXE"
+  AFFINITY_EXE="$(/bin/ls $SCRIPT_DIR/add-affinity-installer-here/*.exe)"
+  for exe in "$AFFINITY_EXE"; do
+    /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine "$exe"
+  done
 }
 
 test_affinity(){
@@ -133,7 +125,7 @@ test_affinity(){
 
 _test_affinity(){
   echo "Starting Affinity Photo";
-  /usr/bin/rum ElementalWarrior "$HOME/.WineAffinity" wine "$HOME/.WineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" 2>/dev/null;
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine "$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" 2>/dev/null;
   echo
   read -p "Press any key after done testing..."
 }
@@ -152,7 +144,7 @@ done
 
 _test_affinity_vulkan(){
   echo "Starting Affinity Photo with Vulkan";
-  /usr/bin/rum ElementalWarrior "$HOME/.WineAffinity" winetrick "$HOME/.WineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" renderer=vulkan 2>/dev/null;
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" winetrick "$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" renderer=vulkan 2>/dev/null;
   echo
   read -p "Press any key after done testing..."
 }
@@ -178,7 +170,7 @@ _create_shortcuts(){
   echo "Terminal=false" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
   echo "Type=Application" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
 
-  echo "Exec=/usr/bin/rum ElementalWarrior $HOME/.WineAffinity wine \'$HOME.WineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe\'" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
+  echo "Exec=/usr/bin/rum ElementalWarrior-$WINE_V $HOME/.wineAffinity wine \'$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe\'" >> "$HOME/.local/share/applications/Affinity Photo.desktop"
 }
 
 cleanup(){
@@ -195,11 +187,20 @@ cleanup(){
 }
 
 _cleanup(){
-  echo "Removing docker and folders";
-  cd "$SCRIPT_DIR";
-  docker compose down --remove-orphans -v --rmi all;
-  cd ..;
-  rm -rf "$SCRIPT_DIR";
+  echo "Removing docker and folders"
+  cd "$SCRIPT_DIR"
+  docker compose down --remove-orphans -v --rmi all
+  cd ..
+  rm -rf "$SCRIPT_DIR"
+}
+
+change_jobs(){
+  read -p "How many threads: " num
+  re='^[0-9]+$'
+  if [[ $num =~ $re ]]; then
+    JOBS=$num
+  fi
+  main
 }
 
 full_script(){
@@ -207,10 +208,10 @@ full_script(){
   get_wine_source
   build_docker
   start_docker
-  make_wine64
+  make_wine
   make_wine32
   wine32_binaries
-  wine64_binaries
+  wine_binaries
   install_wine
   install_rum
   setup_wine
@@ -221,6 +222,78 @@ full_script(){
   create_shortcuts
 }
 
+main(){
+  while true; do
+      echo "          ######### Full script choose 'A' ###########"
+      echo "          Get Wine-Source............................1"
+      echo "          Build Docker...............................2"
+      echo "          Start Docker...............................3"
+      echo "          Make Wine..................................4"
+      echo "          Create Wine Binaries.......................5"
+      echo "          Install Wine on System.....................6"
+      echo "          Install rum on System......................7"
+      echo "          Setup Wine Enviroment......................8"
+      echo "          Add Winmd Files............................9"
+      echo "          Install Affinity...........................B"
+      echo "          Install Dependencies.......................C"
+      echo "          Test Affinity..............................D"
+      echo "          Test Affinity with Vulkan..................E"
+      echo "          Create Launcher Shortcuts..................F"
+      echo "          Stop Docker Container......................G"
+      echo "          Change # of threads to use.................J"
+      echo "          Clean up docker/files......................X"
+      echo "          Quit Script................................Q"
+      echo
+      echo "          Full Script................................A"
+      echo
+
+      read -p "Choice: " ans
+      case $ans in
+          [Aa]* ) echo "Running Full Script";
+                  full_script;
+                  break;;
+          [1]* )  get_wine_source;
+                  break;;
+          [2]* )  build_docker;
+                  break;;
+          [3]* )  start_docker;
+                  break;;
+          [4]* )  make_wine;
+                  break;;
+          [5]* )  wine_binaries;
+                  break;;
+          [6]* )  install_wine;
+                  break;;
+          [7]* )  install_rum;
+                  break;;
+          [8]* )  setup_wine;
+                  break;;
+          [9]* )  add_winmd;
+                  break;;
+          [Bb]* ) install_affinity;
+                  break;;
+          [Cc]* ) install_deps;
+                  break;;
+          [Dd]* ) _test_affinity;
+                  break;;
+          [Ee]* ) _test_affinity_vulkan;
+                  break;;
+          [Ff]* ) _create_shortcuts;
+                  break;;
+          [Gg]* ) stop_docker;
+                  break;;
+          [Jj]* ) change_jobs;
+                  break;;
+          [Xx]* ) _cleanup;
+                  break;;
+          [Qq]* ) echo "Bye!!";
+                  exit;;
+          * ) echo "Not a valid choice.";;
+      esac
+  done
+}
+
+clear
 echo
 echo
 echo "     _     __  __ _       _ _          __        ___             "
@@ -235,74 +308,5 @@ echo "               | || | | \__ \ || (_| | | |  __/ |                "
 echo "              |___|_| |_|___/\__\__,_|_|_|\___|_|                "
 echo "                                                                 "
 echo
-echo
-echo
 
-
-while true; do
-    echo "   ######### Full script choose 'A' ###########"
-    echo "   A................................Full Script"
-    echo "   1............................Get Wine-Source"
-    echo "   2...............................Build Docker"
-    echo "   3...............................Start Docker"
-    echo "   4................................Make Wine64"
-    echo "   5................................Make Wine32"
-    echo "   6.....................Create Wine32 Binaries"
-    echo "   7.....................Create Wine64 Binaries"
-    echo "   8.....................Install Wine on System"
-    echo "   9......................Install rum on System"
-    echo "   B......................Setup Wine Enviroment"
-    echo "   C............................Add Winmd Files"
-    echo "   D...........................Install Affinity"
-    echo "   E.......................Install Dependencies"
-    echo "   F..............................Test Affinity"
-    echo "   G..................Test Affinity with Vulkan"
-    echo "   H..................Create Launcher Shortcuts"
-    echo "   I......................Stop Docker Container"
-    echo "   X......................Clean up docker/files"
-    echo
-
-    read -p "Choice: " ans
-    case $ans in
-        [Aa]* ) echo "Running Full Script";
-                full_script
-                break;;
-        [1]* )  get_wine_source;
-                break;;
-        [2]* )  build_docker;
-                break;;
-        [3]* )  start_docker;
-                break;;
-        [4]* )  make_wine64;
-                break;;
-        [5]* )  make_wine32;
-                break;;
-        [6]* )  wine32_binaries;
-                break;;
-        [7]* )  wine64_binaries;
-                break;;
-        [8]* )  install_wine;
-                break;;
-        [9]* )  install_rum;
-                break;;
-        [Bb]* ) setup_wine;
-                break;;
-        [Cc]* ) add_winmd;
-                break;;
-        [Dd]* ) install_affinity;
-                break;;
-        [Ee]* ) install_deps;
-                break;;
-        [Ff]* ) _test_affinity;
-                break;;
-        [Gg]* ) _test_affinity_vulkan;
-                break;;
-        [Hh]* ) _create_shortcuts;
-                break;;
-        [Ii]* ) stop_docker;
-                break;;
-        [Xx]* ) _cleanup;
-                break;;
-        * ) echo "Not a valid choice.";;
-    esac
-done
+main
