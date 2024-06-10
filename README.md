@@ -20,7 +20,7 @@ Also `docker`, `winetricks` are needed and can be installed with script
 <br/><br/>
 
 ## Add Installer
-Add Affinity msi .exe installer to `add-affinity-installer-here`
+Add Affinity msi .exe installer to `add-affinity-installer-here` folder
 <br/><br/>
 
 ## Add Winmd files
@@ -28,7 +28,7 @@ Add Affinity msi .exe installer to `add-affinity-installer-here`
 
 Located in `C:/Windows/System32/WinMetadata`
 
-Files inside of `WinMetadata` need to be copied to `add-Winmd-files-here`
+Files inside of `WinMetadata` need to be copied to `add-Winmd-files-here` folder
 <br/><br/>
 
 ## Run Scipt
