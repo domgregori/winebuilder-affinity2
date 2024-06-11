@@ -12,7 +12,7 @@ Docker container is a fork of [winebuilder](https://github.com/castaneai/winebui
 # Dependencies
 `sudo apt update && sudo apt install git`
 
-I'm running on Debian 22
+I'm running on Ubuntu 22
 
 Also `docker`, `winetricks` are needed and can be installed with script
 <br/><br/>
