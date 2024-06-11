@@ -29,7 +29,7 @@ RUN apt-get update -y \
 RUN wget http://winetricks.org/winetricks \
 	&& chmod +x winetricks \
 	&& mv winetricks /usr/bin/winetricks
-RUN locale-gen ja_JP.UTF-8
+RUN locale-gen en_US.UTF-8
 
 RUN apt-get update -y \
     && apt-get install -y gstreamer1.0-plugins-base:* gstreamer1.0-plugins-good:* gstreamer1.0-plugins-bad:* gstreamer1.0-plugins-ugly:* gstreamer1.0-libav:*
