@@ -1,6 +1,8 @@
 # Winebuilder For Affinity
 
-Docker container and script for building ElementalWarrior's fork of winehq [link](https://gitlab.winehq.org/ElementalWarrior/wine)
+Docker container and script for building ElementalWarrior's fork of wine [link](https://gitlab.winehq.org/ElementalWarrior/wine)
+
+ElementalWarrior's fork will run Affinity Photo/Designer/Publisher
 
 Script is based off this [site](https://codeberg.org/Wanesty/affinity-wine-docs)
 
