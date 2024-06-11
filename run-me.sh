@@ -98,7 +98,7 @@ add_winmd(){
   echo "Adding Winmd files..."
   echo
   mkdir -p "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
-  cp "$SCRIPT_DIR/add-Winmd-files-here/*.winmd" "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata/"
+  cp "$SCRIPT_DIR/add-Winmd-files-here/"*.winmd "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata/"
 }
 
 install_affinity(){
@@ -106,7 +106,7 @@ install_affinity(){
     echo "Intaller not found. Add it to \"add-affinity-installer-here\" folder"
     read -p "Press Enter after adding installer."
   done
-  AFFINITY_EXE="$(/bin/ls $SCRIPT_DIR/add-affinity-installer-here/*.exe)"
+  AFFINITY_EXE="$(/bin/ls "$SCRIPT_DIR/add-affinity-installer-here/"*.exe)"
   for exe in "$AFFINITY_EXE"; do
     /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine "$exe"
   done
