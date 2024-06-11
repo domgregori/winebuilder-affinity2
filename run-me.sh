@@ -4,6 +4,7 @@
 # trap "set +x; sleep 2; set -x" DEBUG
 JOBS=1
 WINE_V="8.14"
+ELEMENTALWARRIOR_BRANCH="affinity-photo2-wine8.14"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
@@ -26,7 +27,7 @@ get_wine_source(){
   echo
   git submodule update --init --progress
   cd wine-source
-  git switch affinity-photo2-wine$WINE_V
+  git switch $ELEMENTALWARRIOR_BRANCH
   mkdir "$SCRIPT_DIR"/wine-source/wine-build "$SCRIPT_DIR"/wine-source/wine-install
   cd "$SCRIPT_DIR"
 }
@@ -91,7 +92,7 @@ setup_wine(){
 add_winmd(){
   while [ -z "$(/bin/ls $SCRIPT_DIR/add-Winmd-files-here)" ]; do
     echo "Winmd files need to be added to \"add-Winmd-files-here\" folder"
-    read -p "Press any key after adding files."
+    read -p "Press Enter after adding files."
   done
 
   echo "Adding Winmd files..."
@@ -102,7 +103,7 @@ add_winmd(){
 install_affinity(){
   while [ -z "$(/bin/ls $SCRIPT_DIR/add-affinity-installer-here)" ]; do
     echo "Intaller not found. Add it to \"add-affinity-installer-here\" folder"
-    read -p "Press any key after adding installer."
+    read -p "Press Enter after adding installer."
   done
   AFFINITY_EXE="$(/bin/ls $SCRIPT_DIR/add-affinity-installer-here/*.exe)"
   for exe in "$AFFINITY_EXE"; do
@@ -112,7 +113,7 @@ install_affinity(){
 
 test_affinity(){
   while true; do
-      read -p "Test Affinity Photo?" yn
+      read -p "Test Affinity Photo? [y/n] " yn
       case $yn in
           [Yy]* ) _test_affinity;
                   break;;
@@ -124,33 +125,53 @@ test_affinity(){
 
 _test_affinity(){
   echo "Starting Affinity Photo";
-  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine "$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" 2>/dev/null;
+  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" wine "$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe";
   echo
-  read -p "Press any key after done testing..."
+  read -p "Press Enter after done testing."
 }
 
-test_affinity_vulkan(){
-while true; do
-    read -p "Visual Glitches in Affinity; Try with Vulkan?" yn
-    case $yn in
-        [Yy]* ) _test_affinity_vulkan;
-                break;;
-        [Nn]* ) break;;
-        * ) echo "y or n";;
-    esac
-done
+switch_vulkan(){
+  while true; do
+      read -p "Did Affinity have visual glitches? Would you like to try switching to Vulkan render? [y/n] " yn
+      case $yn in
+          [Yy]* ) _switch_vulkan;
+                  break;;
+          [Nn]* ) break;;
+          * ) echo "y or n";;
+      esac
+  done
 }
 
-_test_affinity_vulkan(){
-  echo "Starting Affinity Photo with Vulkan";
-  /usr/bin/rum ElementalWarrior-$WINE_V "$HOME/.wineAffinity" winetrick "$HOME/.wineAffinity/drive_c/Program Files/Affinity/Photo 2/Photo.exe" renderer=vulkan 2>/dev/null;
+_switch_vulkan(){
+  while true; do
+    read -p "Change render to Vulkan or GL, or cancel: [v/g/x] " gl
+      case $gl in
+          [Vv]* ) echo "Switching to Vulkan"
+                  /usr/bin/rum ElementalWarrior-$WINE_V $HOME/.wineAffinity winetricks renderer=vulkan;
+                  break;;
+          [Gg]* ) echo "Switching to GL" 
+                  /usr/bin/rum ElementalWarrior-$WINE_V $HOME/.wineAffinity winetricks renderer=gl;
+                  break;;
+          [Xx]* ) break;;
+          * ) echo "v, g, or x";;
+      esac
+  done
   echo
-  read -p "Press any key after done testing..."
+  while true; do
+      read -p "Test Affinity Photo again? [y/n] " yn
+      case $yn in
+          [Yy]* ) _test_affinity;
+                  break;;
+          [Nn]* ) break;;
+          * ) echo "y or n";;
+      esac
+  done
+
 }
 
 create_shortcuts(){
   while true; do
-      read -p "Create Shortcuts?" yn
+      read -p "Create Shortcuts? [y/n] " yn
       case $yn in
           [Yy]* ) _create_shortcuts;
                   break;;
@@ -174,7 +195,7 @@ _create_shortcuts(){
 
 cleanup(){
   while true; do
-    read -p "Clean up docker and files? (Only do this if Affinity is working.)" yn
+    read -p "Clean up docker and files? (Only do this if Affinity is working.) [y/n] " yn
       case $yn in
           [Yy]* ) _cleanup;
                   break;;
@@ -194,7 +215,7 @@ _cleanup(){
 }
 
 change_jobs(){
-  read -p "How many threads: " num
+  read -p "How many threads for building wine: " num
   re='^[0-9]+$'
   if [[ $num =~ $re ]]; then
     JOBS=$num
@@ -217,36 +238,38 @@ full_script(){
   add_winmd
   install_affinity
   test_affinity
-  test_affinity_vulkan
+  switch_vulkan
   create_shortcuts
 }
 
 main(){
   while true; do
-      echo "          ######### Full script choose 'A' ###########"
-      echo "          Get Wine-Source............................1"
-      echo "          Build Docker...............................2"
-      echo "          Start Docker...............................3"
-      echo "          Make Wine..................................4"
-      echo "          Create Wine Binaries.......................5"
-      echo "          Install Wine on System.....................6"
-      echo "          Install rum on System......................7"
-      echo "          Setup Wine Enviroment......................8"
-      echo "          Add Winmd Files............................9"
-      echo "          Install Affinity...........................B"
-      echo "          Install Dependencies.......................C"
-      echo "          Test Affinity..............................D"
-      echo "          Test Affinity with Vulkan..................E"
-      echo "          Create Launcher Shortcuts..................F"
-      echo "          Stop Docker Container......................G"
-      echo "          Change # of threads to use.................J"
-      echo "          Clean up docker/files......................X"
-      echo "          Quit Script................................Q"
+      echo "  ########## Full script choose 'A' ##########"
+      echo "  Get Wine-Source............................1"
+      echo "  Build Docker...............................2"
+      echo "  Start Docker...............................3"
+      echo "  Make Wine..................................4"
+      echo "  Create Wine Binaries.......................5"
+      echo "  Install Wine on System.....................6"
+      echo "  Install rum on System......................7"
+      echo "  Setup Wine Enviroment......................8"
+      echo "  Add Winmd Files............................9"
+      echo "  Install Affinity...........................B"
+      echo "  Install Dependencies.......................C"
+      echo "  Test Affinity..............................D"
+      echo "  Switch Between Vulkan/GL...................E"
+      echo "  Create Launcher Shortcuts..................F"
+      echo "  Stop Docker Container......................G"
+      echo "  Change # of threads to use.................J"
+      echo "  Clean up docker/files......................X"
+      echo "  Quit Script................................Q"
       echo
-      echo "          Full Script................................A"
+      echo "  Full Script................................A"
+      echo
+      echo "  *Note:  If not in the docker group, sudo will be used*"
       echo
 
-      read -p "Choice: " ans
+      read -p "Choice[A]: " ans
       case $ans in
           [Aa]* ) echo "Running Full Script";
                   full_script;
@@ -275,7 +298,7 @@ main(){
                   break;;
           [Dd]* ) _test_affinity;
                   break;;
-          [Ee]* ) _test_affinity_vulkan;
+          [Ee]* ) _switch_vulkan;
                   break;;
           [Ff]* ) _create_shortcuts;
                   break;;
@@ -287,25 +310,32 @@ main(){
                   break;;
           [Qq]* ) echo "Bye!!";
                   exit;;
-          * ) echo "Not a valid choice.";;
+          * )     full_script;
+                  break;;
       esac
   done
 }
 
 clear
-echo
-echo
-echo "     _     __  __ _       _ _          __        ___             "
-echo "    / \   / _|/ _(_)_ __ (_) |_ _   _  \ \      / (_)_ __   ___  "
-echo "   / _ \ | |_| |_| | '_ \| | __| | | |  \ \ /\ / /| | '_ \ / _ \ "
-echo "  / ___ \|  _|  _| | | | | | |_| |_| |   \ V  V / | | | | |  __/ "
-echo " /_/   \_\_| |_| |_|_| |_|_|\__|\__, |    \_/\_/  |_|_| |_|\___| "
-echo "               ___           _  |___/ _ _                        "
-echo "              |_ _|_ __  ___| |_ __ _| | | ___ _ __              "
-echo "               | || '_ \/ __| __/ _\` | | |/ _ \ '__|            "
-echo "               | || | | \__ \ || (_| | | |  __/ |                "
-echo "              |___|_| |_|___/\__\__,_|_|_|\___|_|                "
-echo "                                                                 "
+echo " █████  ███████ ███████ ██ ███    ██ ██ ████████ ██    ██     ";
+echo "██   ██ ██      ██      ██ ████   ██ ██    ██     ██  ██      ";
+echo "███████ █████   █████   ██ ██ ██  ██ ██    ██      ████       ";
+echo "██   ██ ██      ██      ██ ██  ██ ██ ██    ██       ██        ";
+echo "██   ██ ██      ██      ██ ██   ████ ██    ██       ██        ";
+echo "                                                              ";
+echo "                                                              ";
+echo "██     ██ ██ ███    ██ ███████                                ";
+echo "██     ██ ██ ████   ██ ██                                     ";
+echo "██  █  ██ ██ ██ ██  ██ █████                                  ";
+echo "██ ███ ██ ██ ██  ██ ██ ██                                     ";
+echo " ███ ███  ██ ██   ████ ███████                                ";
+echo "                                                              ";
+echo "                                                              ";
+echo "██████  ██    ██ ██ ██      ██████  ███████ ██████            ";
+echo "██   ██ ██    ██ ██ ██      ██   ██ ██      ██   ██           ";
+echo "██████  ██    ██ ██ ██      ██   ██ █████   ██████            ";
+echo "██   ██ ██    ██ ██ ██      ██   ██ ██      ██   ██           ";
+echo "██████   ██████  ██ ███████ ██████  ███████ ██   ██           ";
 echo
 
 main
