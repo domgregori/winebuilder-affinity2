@@ -21,6 +21,8 @@ Also `docker`, `winetricks` are needed and can be installed with script
 
 ## Add Installer
 Add Affinity msi .exe installer to `add-affinity-installer-here` folder
+
+Installer can be downloaded from Serif site [here](https://store.serif.com/en-us/update/windows/photo/2/)
 <br/><br/>
 
 ## Add Winmd files
@@ -28,7 +30,7 @@ Add Affinity msi .exe installer to `add-affinity-installer-here` folder
 
 Located in `C:/Windows/System32/WinMetadata`
 
-Files inside of `WinMetadata` need to be copied to `add-Winmd-files-here` folder
+*.winmd files inside of `WinMetadata` need to be copied to `add-Winmd-files-here` folder
 <br/><br/>
 
 ## Run Scipt
@@ -39,7 +41,7 @@ To run the full script, choose `A`
 <br/><br/>
 
 # Why
-Having the right building dependencies can be a nightmare especially with multiple architecture. This docker container makes it much eaiser.
+Having the right building dependencies can be a nightmare especially with multiple architectures. This docker container makes it much eaiser.
 
 ElementalWarrior forked the wine source to make a version that works with Affinity but it needs to be built.
 
