@@ -97,7 +97,8 @@ add_winmd(){
 
   echo "Adding Winmd files..."
   echo
-  cp -r "$SCRIPT_DIR/add-Winmd-files-here" "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
+  mkdir -p "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata"
+  cp "$SCRIPT_DIR/add-Winmd-files-here/*.winmd" "$HOME/.wineAffinity/drive_c/windows/system32/WinMetadata/"
 }
 
 install_affinity(){
